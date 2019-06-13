@@ -22,6 +22,7 @@ class Bomb extends React.Component {
       for (let j = 0; j < wid; j++) {
         var obj = {};
         obj.isBomb = this.getRandom(4) === 1;
+        obj.open = false;
         temp.push(obj);
       }
       tempList.push(temp);
@@ -31,11 +32,11 @@ class Bomb extends React.Component {
     // 如果該格是炸彈就不計算
     for (let i = 0; i < len; i++) {
       for (let j = 0; j < wid; j++) {
-        if (!tempList[i][j].isBomb)
-          tempList[i][j].bombCount = this.CountBomb(tempList, i, j, len, wid);
+        tempList[i][j].bombCount = tempList[i][j].isBomb
+          ? 99
+          : this.CountBomb(tempList, i, j, len, wid);
       }
     }
-
     return tempList;
   };
 
@@ -46,12 +47,14 @@ class Bomb extends React.Component {
       for (let j = -1; j < 2; j++) {
         var xIndex = x + i;
         var yIndex = y + j;
-         if (
-           xIndex >= 0 && yIndex >= 0 &&
-           xIndex < len && yIndex < wid &&
-           (xIndex !== x || yIndex !== y) &&
-           bombList[xIndex][yIndex].isBomb
-         )
+        if (
+          xIndex >= 0 &&
+          yIndex >= 0 &&
+          xIndex < len &&
+          yIndex < wid &&
+          (xIndex !== x || yIndex !== y) &&
+          bombList[xIndex][yIndex].isBomb
+        )
           count += 1;
       }
     }
@@ -63,29 +66,24 @@ class Bomb extends React.Component {
     return Math.floor(Math.random() * x);
   };
 
-  handleClick = isbomb => {
+  handleClick = (isbomb) => {
     if (isbomb) console.log("you dead");
     else {
-      // count bomb
-      // refresh bomb
+      
     }
   };
-
-  handleBomb = () => {
-    console.log('you dead');
-  }
 
   handleShowCount = (i, j) => {
     const { bombList } = this.state;
     var tempList = bombList;
 
 
+    tempList[i][j].open = true;
     this.setState({bombList: tempList});
-  }
+  };
 
   render() {
     const { bLen, bWidth, bombList } = this.state;
-
 
     let table = [];
     for (let i = 0; i < bLen; i++) {
@@ -93,10 +91,12 @@ class Bomb extends React.Component {
       for (let j = 0; j < bWidth; j++) {
         temp.push(
           <Cell
-            bLen={i} bWidth={j}
+            xIndex={i}
+            yIndex={j}
             isBomb={bombList[i][j].isBomb}
             bombCount={bombList[i][j].bombCount}
-            handleClick={this.handleClick}
+            open={bombList[i][j].open}
+            handleShowCount ={this.handleShowCount}
             {...this.props}
           />
         );

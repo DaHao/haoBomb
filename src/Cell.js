@@ -5,29 +5,35 @@ class Cell extends React.Component {
     super(props);
 
     this.state = {
-      open: true,
-      bombState: '',
+      bombState: '*',
     };
   }
 
   handleTread = (e) => {
-    const { isBomb  } = this.props;
+    const { open, isBomb, bombCount, xIndex, yIndex  } = this.props;
 
-    this.props.handleClick(isBomb);
+    if (!open) {
+      var str = isBomb ? 'X' :
+        bombCount === 0 ? '' : bombCount;
+      this.setState({bombState: str});
+
+      if (isBomb)
+        console.log('You dead!!');
+      else
+        this.props.handleShowCount(xIndex, yIndex);
+    }
   }
 
   render() {
-    console.log(this.props);
-    const { open, bombState } = this.state;
-    const { bombCount } = this.props;
+    const { bombState } = this.state;
 
     return (
-      open ?
-      <input type="button" styel={{'background-color': 'red'}} />
-      :<input
+      <input
         type="button"
         onClick={this.handleTread}
-        value={bombCount}/>
+        value={bombState}
+        style={{ width: '30px'}}
+      />
     )
   }
 }

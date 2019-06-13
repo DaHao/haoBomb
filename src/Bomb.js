@@ -27,19 +27,20 @@ class Bomb extends React.Component {
       tempList.push(temp);
     }
 
+    // 計算每個附近炸彈數
+    // 如果該格是炸彈就不計算
     for (let i = 0; i < len; i++) {
       for (let j = 0; j < wid; j++) {
-        tempList[i][j].bombCount = this.CountBomb(tempList, i, j, len, wid);
+        if (!tempList[i][j].isBomb)
+          tempList[i][j].bombCount = this.CountBomb(tempList, i, j, len, wid);
       }
     }
 
-    console.log(tempList);
     return tempList;
   };
 
   CountBomb = (bombList, x, y, len, wid) => {
     let count = 0;
-    //console.log(bombList);
 
     for (let i = -1; i < 2; i++) {
       for (let j = -1; j < 2; j++) {
@@ -69,6 +70,18 @@ class Bomb extends React.Component {
       // refresh bomb
     }
   };
+
+  handleBomb = () => {
+    console.log('you dead');
+  }
+
+  handleShowCount = (i, j) => {
+    const { bombList } = this.state;
+    var tempList = bombList;
+
+
+    this.setState({bombList: tempList});
+  }
 
   render() {
     const { bLen, bWidth, bombList } = this.state;

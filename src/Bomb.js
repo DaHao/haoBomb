@@ -1,7 +1,7 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import Cell from './Cell';
+import React from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import Cell from "./Cell";
 
 class Bomb extends React.Component {
   constructor(props) {
@@ -9,55 +9,87 @@ class Bomb extends React.Component {
 
     this.state = {
       bLen: 5,
-      bWidth: 5,
+      bWidth: 5
     };
 
+    this.state.bombList = this.genBoard(this.state.bLen, this.state.bWidth);
+  }
+
+  genBoard = (len, wid) => {
     var tempList = [];
-    for(let i = 0; i < this.state.bLen; i++) {
+    for (let i = 0; i < len; i++) {
       var temp = [];
-      for(let j = 0; j < this.state.bWidth; j++) {
-        var isBomb = this.getRandom(2) === 1;
-        temp.push(isBomb);
+      for (let j = 0; j < wid; j++) {
+        var obj = {};
+        obj.isBomb = this.getRandom(4) === 1;
+        temp.push(obj);
       }
       tempList.push(temp);
     }
 
-    this.state.bombList = tempList;
+    for (let i = 0; i < len; i++) {
+      for (let j = 0; j < wid; j++) {
+        tempList[i][j].bombCount = this.CountBomb(tempList, i, j, len, wid);
+      }
+    }
 
-    
-  }
+    console.log(tempList);
+    return tempList;
+  };
 
-  getRandom = (x) => {
-    return Math.floor(Math.random()*x);
-  }
+  CountBomb = (bombList, x, y, len, wid) => {
+    let count = 0;
+    //console.log(bombList);
 
-  handleClick = (isbomb) => {
-    if (isbomb) console.log('you dead');
+    for (let i = -1; i < 2; i++) {
+      for (let j = -1; j < 2; j++) {
+        var xIndex = x + i;
+        var yIndex = y + j;
+         if (
+           xIndex >= 0 && yIndex >= 0 &&
+           xIndex < len && yIndex < wid &&
+           (xIndex !== x || yIndex !== y) &&
+           bombList[xIndex][yIndex].isBomb
+         )
+          count += 1;
+      }
+    }
+
+    return count;
+  };
+
+  getRandom = x => {
+    return Math.floor(Math.random() * x);
+  };
+
+  handleClick = isbomb => {
+    if (isbomb) console.log("you dead");
     else {
       // count bomb
       // refresh bomb
     }
-  }
+  };
 
   render() {
     const { bLen, bWidth, bombList } = this.state;
-    console.log(bombList);
+
 
     let table = [];
-    for (let i=0; i<bLen; i++) {
+    for (let i = 0; i < bLen; i++) {
       var temp = [];
-      for(let j=0; j<bWidth; j++) {
+      for (let j = 0; j < bWidth; j++) {
         temp.push(
           <Cell
-            bLen={i}
-            bWidth={j}
-            isbomb={bombList[i][j]}
-            {...this.props}
+            bLen={i} bWidth={j}
+            isBomb={bombList[i][j].isBomb}
+            bombCount={bombList[i][j].bombCount}
             handleClick={this.handleClick}
-          />);
+            {...this.props}
+          />
+        );
       }
       table.push(temp);
-      table.push(<br/>);
+      table.push(<br />);
     }
 
     return table;
